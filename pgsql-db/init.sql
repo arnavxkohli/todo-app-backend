@@ -6,13 +6,9 @@ CREATE TABLE users (
 
 CREATE TABLE todos (
     TodoID VARCHAR(36) PRIMARY KEY,
+    UserID VARCHAR(36) REFERENCES users(UserID),
     CreatedDate DATE NOT NULL,
     DueDate DATE,
     Info VARCHAR(1000)
-);
-
-CREATE TABLE user_todos (
-    TodoID VARCHAR(36) REFERENCES todos(TodoID),
-    UserID VARCHAR(36) REFERENCES users(UserID)
 );
 

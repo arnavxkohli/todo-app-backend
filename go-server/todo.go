@@ -43,14 +43,44 @@ func handleNewTODO(db *sql.DB, ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": "TODO created"})
 }
 
-// func handleFetchTODO(db *sql.DB, ctx *gin.Context) {
-// 	var fetchTODO TODO
-// 	var err error
+func handleFetchTodos(db *sql.DB, ctx *gin.Context) {
+	var err error
+	userID := ctx.Query("id")
 
-// 	if err = ctx.BindJSON(&fetchTODO); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": err.Error()})
-// 		return
-// 	}
+	todos, err := db.Prepare("SELECT CreatedDate, DueDate, Info FROM todos WHERE UserID = $1;")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
+		return
+	}
+	defer todos.Close() // Close the prepared statement after it's used
 
-// 	ctx.JSON(http.StatusOK, gin.H{"status": "error", "message": "TODOs fetched", "data": gin.H{}})
-// }
+	rows, err := todos.Query(userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
+		return
+	}
+	defer rows.Close() // Close the rows after they are scanned
+
+	var fetchedTodos []map[string]interface{}
+	for rows.Next() {
+		var createdDate time.Time
+		var dueDate sql.NullTime
+		var info string
+
+		err = rows.Scan(&createdDate, &dueDate, &info)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
+			return
+		}
+
+		todo := map[string]interface{}{
+			"CreatedDate": createdDate,
+			"DueDate":     dueDate,
+			"Info":        info,
+		}
+
+		fetchedTodos = append(fetchedTodos, todo)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": fetchedTodos})
+}

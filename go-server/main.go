@@ -35,7 +35,11 @@ func main() {
 		handleNewTODO(db, ctx)
 	})
 
-	gin.SetMode(gin.ReleaseMode)
+    router.GET("/get-todos", func(ctx *gin.Context){
+        handleFetchTodos(db, ctx)
+    })
+
+	// gin.SetMode(gin.ReleaseMode)
 
 	err = router.Run(":8000")
 	if err != nil {

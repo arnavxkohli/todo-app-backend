@@ -1,3 +1,5 @@
+CREATE TYPE PRIORITY_LEVEL AS ENUM('low', 'medium', 'high');
+
 CREATE TABLE users (
     UserID VARCHAR(36) PRIMARY KEY,
     Username VARCHAR(50) UNIQUE NOT NULL,
@@ -9,6 +11,7 @@ CREATE TABLE todos (
     UserID VARCHAR(36) REFERENCES users(UserID),
     CreatedDate DATE NOT NULL,
     DueDate DATE,
-    Info VARCHAR(1000)
+    Info VARCHAR(1000),
+    Priority PRIORITY_LEVEL NOT NULL
 );
 

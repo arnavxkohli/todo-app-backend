@@ -39,6 +39,10 @@ func main() {
 		handleFetchTodos(db, ctx)
 	})
 
+	router.PATCH("/update-todo", func(ctx *gin.Context) {
+		handleUpdateTodo(db, ctx)
+	})
+
 	router.DELETE("/delete-todo", func(ctx *gin.Context) {
 		handleDeleteTodo(db, ctx)
 	})

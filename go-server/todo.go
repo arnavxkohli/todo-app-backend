@@ -45,9 +45,9 @@ func handleNewTODO(db *sql.DB, ctx *gin.Context) {
 
 func handleFetchTodos(db *sql.DB, ctx *gin.Context) {
 	var err error
-	userID := ctx.Query("id")
+	userID := ctx.Query("uid")
 
-	todos, err := db.Prepare("SELECT CreatedDate, DueDate, Info FROM todos WHERE UserID = $1;")
+	todos, err := db.Prepare("SELECT TodoID, CreatedDate, DueDate, Info FROM todos WHERE UserID = $1;")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
 		return
@@ -63,17 +63,19 @@ func handleFetchTodos(db *sql.DB, ctx *gin.Context) {
 
 	var fetchedTodos []map[string]interface{}
 	for rows.Next() {
+		var todoID string
 		var createdDate time.Time
 		var dueDate sql.NullTime
 		var info string
 
-		err = rows.Scan(&createdDate, &dueDate, &info)
+		err = rows.Scan(&todoID, &createdDate, &dueDate, &info)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
 			return
 		}
 
 		todo := map[string]interface{}{
+			"TodoID":      todoID,
 			"CreatedDate": createdDate,
 			"DueDate":     dueDate,
 			"Info":        info,
@@ -83,4 +85,24 @@ func handleFetchTodos(db *sql.DB, ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"data": fetchedTodos})
+}
+
+func handleDeleteTodo(db *sql.DB, ctx *gin.Context) {
+	var err error
+	todoID := ctx.Query("tid")
+
+	del, err := db.Prepare("DELETE FROM todos WHERE TodoID = $1")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
+		return
+	}
+	defer del.Close()
+
+	_, err = del.Exec(todoID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": "Database Error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": todoID + " Deleted"})
 }

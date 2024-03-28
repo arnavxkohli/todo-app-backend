@@ -35,9 +35,13 @@ func main() {
 		handleNewTODO(db, ctx)
 	})
 
-    router.GET("/get-todos", func(ctx *gin.Context){
-        handleFetchTodos(db, ctx)
-    })
+	router.GET("/get-todos", func(ctx *gin.Context) {
+		handleFetchTodos(db, ctx)
+	})
+
+	router.DELETE("/delete-todo", func(ctx *gin.Context) {
+		handleDeleteTodo(db, ctx)
+	})
 
 	// gin.SetMode(gin.ReleaseMode)
 

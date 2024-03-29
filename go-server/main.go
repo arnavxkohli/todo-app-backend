@@ -23,27 +23,31 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/", func(ctx *gin.Context) {
+	router.GET("/api", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, "Welcome to this todo app!")
 	})
 
-	router.POST("/add-user", func(ctx *gin.Context) {
+	router.POST("/api/users", func(ctx *gin.Context) {
 		handleNewUser(db, ctx)
 	})
 
-	router.POST("/add-todo", func(ctx *gin.Context) {
+	router.DELETE("/api/users", func (ctx *gin.Context)  {
+		handleDeleteUser(db, ctx)
+	})
+
+	router.POST("/api/todos", func(ctx *gin.Context) {
 		handleNewTODO(db, ctx)
 	})
 
-	router.GET("/get-todos", func(ctx *gin.Context) {
+	router.GET("/api/todos", func(ctx *gin.Context) {
 		handleFetchTodos(db, ctx)
 	})
 
-	router.PATCH("/update-todo", func(ctx *gin.Context) {
+	router.PATCH("/api/todos", func(ctx *gin.Context) {
 		handleUpdateTodo(db, ctx)
 	})
 
-	router.DELETE("/delete-todo", func(ctx *gin.Context) {
+	router.DELETE("/api/todos", func(ctx *gin.Context) {
 		handleDeleteTodo(db, ctx)
 	})
 

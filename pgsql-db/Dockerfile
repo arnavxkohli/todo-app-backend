@@ -8,4 +8,4 @@ RUN rm -rf /var/lib/postgresql/data/*
 
 COPY init.sql /docker-entrypoint-initdb.d/
 
-EXPOSE 5432 
+EXPOSE 5432
